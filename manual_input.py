@@ -1,30 +1,48 @@
-from Tkinter import Tk
+import click
+from client.connection3 import connection
 
-from twisted.internet import tksupport
 
+def keypress(x):
+    if x == chr(27):
+        return False
 
-def keypress(event):
-    from client.connection import OuterSscope, reactor
-    if event.keysym == 'Escape':
-        from client.connection import reactor
-        reactor.stop()
-        root.destroy()
-    x = event.char
     if x == "w":
         print "blaw blaw blaw"
     elif x == "a":
         print "blaha blaha blaha"
     elif x == "s":
-        print "blash blash blash"
-    elif x == "d":
-        print "blad blad blad"
+        print 'send'
+        connection.send_message({
+            'endpoint': 'client/register',
+            'data': 'test',
+        })
+    elif x == "t":
+        print('Client index: ')
+        client_index = int(click.getchar())
+        connection.send_message({
+            'endpoint': 'client/send-test',
+            'clientIndex': client_index,
+        })
     else:
         print x
 
+    return True
 
-root = Tk()
-print "Press a key (Escape key to exit):"
-root.bind_all('<Key>', keypress)
-# don't show the tk window
-root.withdraw()
-tksupport.install(root)
+
+while True:
+    try:
+        print 'Ready for input:'
+        if not keypress(click.getchar()):
+            break
+    except KeyboardInterrupt:
+        connection.close()
+        break
+
+# root = Tk()
+#
+# print "Press a key (Escape key to exit):"
+# root.bind_all('<Key>', keypress)
+# # don't show the tk window
+# root.withdraw()
+# root.mainloop()
+# # tksupport.install(root)
